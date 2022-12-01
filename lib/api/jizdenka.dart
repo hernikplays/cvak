@@ -1,6 +1,28 @@
 import 'package:json_annotation/json_annotation.dart';
 
-enum Dopravce { ceskeDrahy, regioJet }
+/*
+    Copyright (C) 2022 Matyáš Caras
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    */
+
+enum Dopravce {
+  @JsonValue("CESKEDRAHY")
+  ceskeDrahy,
+  @JsonValue("REGIOJET")
+  regioJet
+}
 
 abstract class Jizdenka {
   final Dopravce dopravce;
@@ -12,6 +34,7 @@ abstract class Jizdenka {
   final String jmeno;
   final double cena;
   final Class trida;
+  final String id;
   const Jizdenka(
       {required this.jmeno,
       required this.dopravce,
@@ -21,7 +44,13 @@ abstract class Jizdenka {
       required this.zeStanice,
       required this.doStanice,
       required this.cena,
-      required this.trida});
+      required this.trida,
+      required this.id});
+
+  factory Jizdenka.fromJson(Map<String, dynamic> json) =>
+      throw UnimplementedError();
+
+  Map<String, dynamic> toJson() => throw UnimplementedError();
 }
 
 abstract class Spoj {

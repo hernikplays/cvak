@@ -1,9 +1,27 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'jizdenka.dart';
 part 'ceskedrahy.g.dart';
+
+/*
+    Copyright (C) 2022 Matyáš Caras
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    */
 
 class CeskeDrahy {
   final Map<String, String> _cookie = {};
@@ -88,8 +106,24 @@ class CeskeDrahy {
         });
     var data = jsonDecode(r.body);
     var jizdenky = <CDJizdenka>[];
+    SharedPreferences p = await SharedPreferences.getInstance();
+    var path = p.getString("dlpath")!;
     for (var j in data["items"]) {
-      jizdenky.add(CDJizdenka.fromJson(j));
+      var cd = CDJizdenka.fromJson(j);
+      // stáhnout obrázek
+      var imgData = await http.get(Uri.parse("https://cd.cz${cd.qrUrl}"),
+          headers: {"Cookie": _cookieString()});
+      // TODO FIX
+      if (imgData.statusCode < 400) {
+        var b64Data =
+            RegExp(r'src="data:image;base64,(.+?)"').firstMatch(imgData.body);
+        if (b64Data != null) {
+          print(b64Data.group(1));
+          File("$path/${j.id}.png")
+              .writeAsBytesSync(base64Decode(b64Data.group(1)!));
+        }
+      }
+      jizdenky.add(cd);
     }
     return jizdenky;
   }
@@ -138,10 +172,18 @@ class CDJizdenka implements Jizdenka {
   @JsonKey(name: "serviceClass")
   final Class trida;
 
+  @JsonKey(name: "aztecImageUrl")
+  final String qrUrl;
+
+  @override
+  @JsonKey(name: "transactionCode")
+  final String id;
+
   factory CDJizdenka.fromJson(Map<String, dynamic> json) =>
       _$CDJizdenkaFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
+  @override
   Map<String, dynamic> toJson() => _$CDJizdenkaToJson(this);
 
   const CDJizdenka(
@@ -153,7 +195,9 @@ class CDJizdenka implements Jizdenka {
       required this.zeStanice,
       required this.vracena,
       required this.cena,
-      required this.trida});
+      required this.trida,
+      required this.qrUrl,
+      required this.id});
 }
 
 @JsonSerializable()

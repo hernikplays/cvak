@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flutter_downloader_notification_started">Stahování začalo</string>
+    <string name="flutter_downloader_notification_in_progress">Stahování probíhá</string>
+    <string name="flutter_downloader_notification_canceled">Stahování zrušeno</string>
+    <string name="flutter_downloader_notification_failed">Stahování selhalo</string>
+    <string name="flutter_downloader_notification_complete">Stahování dokončeno</string>
+    <string name="flutter_downloader_notification_paused">Stahování pozastaveno</string>
+</resources>

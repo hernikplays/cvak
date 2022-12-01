@@ -19,7 +19,9 @@ CDJizdenka _$CDJizdenkaFromJson(Map<String, dynamic> json) => CDJizdenka(
       zeStanice: json['stationFrom'] as String,
       vracena: json['isRefunded'] as bool,
       cena: const _CenaPrevodnik().fromJson(json['price'] as int),
-      trida: json['serviceClass'],
+      trida: $enumDecode(_$ClassEnumMap, json['serviceClass']),
+      qrUrl: json['aztecImageUrl'] as String,
+      id: json['transactionCode'] as String,
     );
 
 Map<String, dynamic> _$CDJizdenkaToJson(CDJizdenka instance) =>
@@ -32,8 +34,16 @@ Map<String, dynamic> _$CDJizdenkaToJson(CDJizdenka instance) =>
       'stationFrom': instance.zeStanice,
       'isRefunded': instance.vracena,
       'price': const _CenaPrevodnik().toJson(instance.cena),
-      'serviceClass': instance.trida,
+      'serviceClass': _$ClassEnumMap[instance.trida]!,
+      'aztecImageUrl': instance.qrUrl,
+      'transactionCode': instance.id,
     };
+
+const _$ClassEnumMap = {
+  Class.class2: 'Class2',
+  Class.class1: 'Class1',
+  Class.business: 'Business',
+};
 
 CDSpoj _$CDSpojFromJson(Map<String, dynamic> json) => CDSpoj(
       nazev: json['train'] as String,
